@@ -1,0 +1,79 @@
+<div class="container">
+  <h2 *ngIf="!viewAsStudent" nz-typography>
+    <span>Quản lý danh sách phiếu điểm rèn luyện lớp</span>
+    <span *ngIf="checkView('classleader')"> {{classname}}</span>
+  </h2>
+  <h2 *ngIf="viewAsStudent" nz-typography>
+    <span>Quản lý danh sách phiếu điểm rèn luyện cá nhân</span>
+  </h2>
+  <div *ngIf="!viewAsStudent" class="filter">
+    <div class="search-info">
+      <nz-select nzShowSearch nzPlaceHolder="Chọn học kỳ" [(ngModel)]="selectedPeriod">
+        <nz-option *ngFor="let period of listPeriod" [nzLabel]="period.title" [nzValue]="period.id"></nz-option>
+      </nz-select>
+
+
+      <nz-select *ngIf="checkView('cvht')" id="list-class" [(ngModel)]="selectedClass" [nzMaxTagCount]="3"
+        nzPlaceHolder="Tìm sinh viên lớp">
+        <nz-option #classOption *ngFor="let option of listClass" [nzLabel]="option.short_name" [nzValue]="option.id">
+        </nz-option>
+      </nz-select>
+
+      <input nzAllowClear nz-input placeholder="Tên sinh viên" [(ngModel)]="searchStudent" />
+
+
+    </div>
+    <button (click)="search()" nzSize="large" nz-button nzType="primary" nzShape="circle"><span nz-icon
+        nzType="search"></span></button>
+  </div>
+
+  <div class="table container">
+    <nz-table nzBordered #Table [nzData]="listPoints">
+      <thead>
+        <tr>
+
+          <th nzWidth="5%">STT</th>
+          <th *ngIf="viewAsStudent" nzWidth="25%">Học kỳ</th>
+          <th *ngIf="!viewAsStudent" nzWidth="10%">Mã SV</th>
+          <th *ngIf="!viewAsStudent" nzWidth="15%">Tên SV</th>
+          <th *ngIf="!viewAsStudent" nzWidth="8%">Ngày sinh</th>
+          <th *ngIf="!viewAsStudent" nzWidth="12%">Lớp</th>
+          <th nzWidth="15%">Điểm tự đánh giá</th>
+          <th nzWidth="15%">Điểm lớp xét duyệt</th>
+          <th nzWidth="15%">Điểm xác nhận</th>
+          <th nzWidth="15%">Trạng thái</th>
+          <th nzWidth="20%">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Table.data">
+          <td>{{ Table.data.indexOf(data)+1}}</td>
+          <td *ngIf="viewAsStudent">{{ data.period }}</td>
+          <td *ngIf="!viewAsStudent">{{ data.student_id }}</td>
+          <td *ngIf="!viewAsStudent">{{ data.student_name }}</td>
+
+          <td *ngIf="!viewAsStudent">{{ data.birthday | date:"dd/MM/YYYY" }}</td>
+          <td *ngIf="!viewAsStudent">{{ data.class }}</td>
+
+          <td>{{ data.form_point }}</td>
+          <td>{{ data.approval_point }}</td>
+          <td>{{ data.confirm_point }}</td>
+
+          <td>
+            <nz-tag [nzColor]="'green'"> {{data.status}}</nz-tag>
+          </td>
+          <td>
+            <div style=" display: flex" class="flex">
+              <button *ngIf="checkView('cvht')" [routerLink]="'/teacher/form/'+data.id" nz-button
+                nzType="default">Xem</button>
+              <button *ngIf="checkView('classleader') && !viewAsStudent" [routerLink]="'/leader/form/'+data.id"
+                nz-button nzType="default">Xem</button>
+              <button *ngIf="(checkView('classleader') || checkView('student')) && viewAsStudent"
+                [routerLink]="'/student/form/'+data.id" nz-button nzType="default">Xem</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+nz-table {
+  width: 100%;
+}
+
+nz-alert {
+  width: 150px;
+}
+
+.create-bar {
+  width: 100%;
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.fillter {
+  width: 70%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+
+  nz-select {
+    width: 30%;
+    margin: 0px 10px;
+  }
+
+  .ant-input {
+    width: 30% !important;
+    margin: 0px 10px;
+  }
+}

@@ -1,0 +1,128 @@
+<nz-layout class="layout">
+  <nz-sider [ngStyle]="{overflow: 'auto', height: '100vh', position: 'sticky', top: 0, left: 0}" #sider nzCollapsible
+    nzTheme="light" nzWidth="200px">
+    <div class="flex top">
+      <div class="logo">
+        <span><img src="../assets/image/hce.png" /></span>
+        <h2 nz-typography *ngIf="!sider.nzCollapsed">RÈN LUYỆN</h2>
+      </div>
+      <ul nz-menu nzMode="inline">
+        <li nzSelected routerLink="/noti" nz-menu-item>
+          <span nz-icon nzType="bell" nzTheme="outline"></span>
+          <span>Thông Báo</span>
+        </li>
+        <li nzIcon="appstore" nzTitle="Quản lý" nz-submenu *ngIf="checkView('ctsv')">
+          <ul>
+            <li routerLink="/admin/account" nz-menu-item>
+              <span nz-icon nzType="user-add" nzTheme="outline"></span>
+              <span>Tài khoản</span>
+            </li>
+            <li routerLink="/admin/periods" nz-menu-item>
+              <span nz-icon nzType="calendar" nzTheme="outline"></span>
+              <span>Kỳ tổ chức</span>
+            </li>
+            <li routerLink="/admin/notification" nz-menu-item>
+              <span nz-icon nzType="notification" nzTheme="outline"></span>
+              <span>Thông báo</span>
+            </li>
+
+            <li routerLink="/admin/listform" nz-menu-item>
+              <span nz-icon nzType="solution" nzTheme="outline"></span>
+              <span>Phiếu đánh giá</span>
+            </li>
+
+            <li routerLink="/admin/result" nz-menu-item>
+              <span nz-icon nzType="file-protect" nzTheme="outline"></span>
+              <span>Kết quả rèn luyện</span>
+            </li>
+          </ul>
+        </li>
+
+        <li nzIcon="appstore" nzTitle="Quản lý lớp" nz-submenu *ngIf="checkView('cvht')">
+          <ul>
+            <li routerLink="/teacher/listform" nz-menu-item>
+              <span nz-icon nzType="solution" nzTheme="outline"></span>
+              <span>Phiếu đánh giá</span>
+            </li>
+
+            <li routerLink="/teacher/result" nz-menu-item>
+              <span nz-icon nzType="file-protect" nzTheme="outline"></span>
+              <span>Kết quả rèn luyện</span>
+            </li>
+          </ul>
+        </li>
+
+        <li nzIcon="appstore" nzTitle="Quản lý lớp" nz-submenu *ngIf="checkView('classleader')">
+          <ul>
+            <li routerLink="/leader/listform" nz-menu-item>
+              <span nz-icon nzType="solution" nzTheme="outline"></span>
+              <span>Phiếu đánh giá</span>
+            </li>
+
+            <li routerLink="/leader/result" nz-menu-item>
+              <span nz-icon nzType="file-protect" nzTheme="outline"></span>
+              <span>Kết quả rèn luyện</span>
+            </li>
+          </ul>
+        </li>
+
+        <li nzIcon="appstore" nzTitle="Sinh viên" nz-submenu *ngIf="checkView('student') || checkView('classleader')">
+          <ul>
+            <li routerLink="/student/newform" nz-menu-item>
+              <span nz-icon nzType="solution" nzTheme="outline"></span>
+              <span>Tạo phiếu đánh giá</span>
+            </li>
+            <li routerLink="/student/listform" nz-menu-item>
+              <span nz-icon nzType="solution" nzTheme="outline"></span>
+              <span>DS Phiếu đánh giá</span>
+            </li>
+
+            <li routerLink="/student/result" nz-menu-item>
+              <span nz-icon nzType="file-protect" nzTheme="outline"></span>
+              <span>Kết quả rèn luyện</span>
+            </li>
+          </ul>
+        </li>
+
+        <li nzIcon="user" nzTitle="Tài khoản" nz-submenu *ngIf="checkLogin()">
+          <ul>
+            <li routerLink="/account/info" nz-menu-item>
+              <span nz-icon nzType="eye" nzTheme="outline"></span>
+              <span>Xem thông tin</span>
+            </li>
+            <li routerLink="/account/changepass" nz-menu-item>
+              <span nz-icon nzType="user-switch" nzTheme="outline"></span>
+              <span>Đổi mật khẩu</span>
+            </li>
+
+          </ul>
+        </li>
+
+        <li *ngIf="!checkLogin()" routerLink="/login" nz-menu-item>
+          <span nz-icon nzType="logout" nzTheme="outline"></span>
+          <span>Đăng Nhập</span>
+        </li>
+
+        <li (click)="logout()" *ngIf="checkLogin()" routerLink="/logout" nz-menu-item>
+          <span nz-icon nzType="login" nzTheme="outline"></span>
+          <span>Đăng Xuất</span>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="!sider.nzCollapsed && renderInfo().name" class="flex bottom">
+      <nz-card tyle="margin-top: 16px">
+        <nz-card-meta [nzTitle]="renderInfo().name" [nzDescription]="renderInfo().role">
+        </nz-card-meta>
+      </nz-card>
+    </div>
+  </nz-sider>
+  <nz-layout class="right-layout">
+    <nz-content>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>
+
+<app-loading></app-loading>

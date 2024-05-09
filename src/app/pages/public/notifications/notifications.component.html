@@ -1,0 +1,27 @@
+<div class="noti-container">
+  <nz-carousel nzAutoPlay>
+    <div nz-carousel-content *ngFor="let index of imageArray">
+      <img *ngIf="index == 1" src="../../../../assets/image/banner.png" alt="">
+      <img *ngIf="index == 2" src="../../../../assets/image/banner2.jpg" alt="">
+      <img *ngIf="index == 3" src="../../../../assets/image/banner3.jpg" alt="">
+    </div>
+  </nz-carousel>
+
+  <div class="container">
+    <h2 nz-typography>Thông Báo</h2>
+
+    <nz-card #card_noti *ngFor="let noti of notiData" style="width:100%; margin-bottom: 20px;"
+      [nzActions]="[actionEdit]">
+      <nz-card-meta nzTitle="{{ noti.title + ' - '+ noti.period}}" nzDescription="{{ noti.content}}"
+        [nzAvatar]="avatarTemplate">
+      </nz-card-meta>
+    </nz-card>
+    <ng-template #avatarTemplate>
+      <nz-avatar nzSrc="../../../../assets/image/hce.png"></nz-avatar>
+    </ng-template>
+    <ng-template #actionEdit>
+      <span *ngIf="checkView('student') || checkView('classleader')" [routerLink]=" ['../student/newform']" nz-icon
+        nzType="edit"></span>
+    </ng-template>
+  </div>
+</div>

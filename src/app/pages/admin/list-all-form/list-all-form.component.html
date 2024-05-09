@@ -1,0 +1,71 @@
+<div class="container">
+    <h2 nz-typography>Quản lý danh sách phiếu điểm rèn luyện toàn trường</h2>
+    <div class="fillter">
+        <nz-select nzShowSearch nzPlaceHolder="Chọn học kỳ" [(ngModel)]="selectedPeriod">
+            <nz-option *ngFor="let period of listPeriod" [nzLabel]="period.title" [nzValue]="period.id"></nz-option>
+        </nz-select>
+        <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Chọn trạng thái phiếu" [(ngModel)]="selectedStatus">
+            <nz-option *ngFor="let status of listStatus" [nzLabel]="status.title" [nzValue]="status.id"></nz-option>
+        </nz-select>
+        <nz-select [(ngModel)]="selectedClass" [nzMaxTagCount]="3" nzMode="multiple" nzPlaceHolder="Tìm sinh viên lớp">
+            <nz-option #classOption *ngFor="let option of listClass" [nzLabel]="option.shortname" [nzValue]="option.id">
+            </nz-option>
+        </nz-select>
+
+        <input nz-input placeholder="Tên sinh viên" [(ngModel)]="searchStudent" />
+
+        <button (click)="search()" nzSize="large" nz-button nzType="primary" nzShape="circle"><span nz-icon
+                nzType="search"></span></button>
+    </div>
+
+    <div class="table container">
+        <nz-table nzShowSizeChanger nzBordered #Table [nzData]="listPoints">
+            <thead>
+                <tr>
+                    <th nzWidth="5%">STT</th>
+                    <th nzSortOrder="ascend" [nzSortFn]="column.student_id.sortFn" nzWidth="10%">Mã SV</th>
+                    <th [nzSortFn]="column.student_name.sortFn" nzWidth="15%">Tên SV</th>
+                    <th nzWidth="8%">Ngày sinh</th>
+                    <th [nzSortFn]="column.class.sortFn" nzWidth="12%">Lớp</th>
+                    <th [nzSortFn]="column.form_point.sortFn" nzWidth="15%">Điểm tự đánh giá</th>
+                    <th [nzSortFn]="column.confirm_point.sortFn" nzWidth="15%">Điểm xác nhận</th>
+                    <th [nzSortFn]="column.result_point.sortFn" nzWidth="15%">Điểm chính thức</th>
+                    <th [nzSortFn]="column.status.sortFn" nzWidth="15%">Trạng thái</th>
+                    <th nzWidth="20%">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of Table.data">
+                    <td>{{ Table.data.indexOf(data)+1}}</td>
+                    <td>{{ data.student_id }}</td>
+                    <td>{{ data.student_name }}</td>
+
+                    <td>{{ data.birthday | date:"dd/MM/YYYY" }}</td>
+                    <td>{{ data.class }}</td>
+
+                    <td>{{ data.form_point }}</td>
+                    <td>{{ data.confirm_point }}</td>
+                    <td>{{ data.result_point }}</td>
+                    <td>
+                        <nz-tag [nzColor]="'green'"> {{data.status}}</nz-tag>
+                    </td>
+                    <td>
+                        <div style=" display: flex" class="flex">
+                            <button [routerLink]="'/admin/form/'+data.id" nz-button nzType="default">Xem</button>
+                            <nz-divider *ngIf="data.confirm_point && !data.result_point" nzType="vertical"></nz-divider>
+                            <button (nzOnConfirm)="submit(data.id, data.confirm_point)"
+                                *ngIf="data.confirm_point && !data.result_point" nzType="primary" nz-popconfirm
+                                nzPopconfirmTitle="Xác nhận công bố kết quả điểm cho sinh viên!"
+                                nzPopconfirmPlacement="topRight" nz-button>
+                                Công bố
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </nz-table>
+    </div>
+</div>
+<!-- <button nz-button nzType="primary" [nzLoading]="false">
+    Công bố tất cả
+</button> -->

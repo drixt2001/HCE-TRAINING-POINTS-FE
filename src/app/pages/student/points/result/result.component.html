@@ -1,0 +1,71 @@
+<div *ngIf="!(loadingService.isLoading$ | async) && selectedStudent.student_id" class="container">
+  <h2 nz-typography>Kết quả điểm rèn luyện</h2>
+  <div class="info">
+    <form class="child left" nz-form>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="12">Mã sinh viên</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-tag nzMode="checkable" [nzChecked]="true">{{
+            selectedStudent.student_id
+            }}</nz-tag>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="12">Họ và Tên</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-tag nzMode="checkable" [nzChecked]="true">{{
+            selectedStudent.student_name
+            }}</nz-tag>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="12">Lớp</nz-form-label>
+        <nz-form-control [nzSpan]="12">
+          <nz-tag nzMode="checkable" [nzChecked]="true">{{
+            selectedStudent.class
+            }}</nz-tag>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+    <div class="child right">
+      <nz-card>
+        <nz-statistic [nzValue]="(selectedStudent.result_point | number)!" [nzTitle]="'Điểm rèn luyện toàn khóa'"
+          [nzValueStyle]="{ color: '#3F8600' }"></nz-statistic>
+      </nz-card>
+
+      <nz-card>
+        <nz-statistic [nzValue]="selectedStudent.rank" [nzTitle]="'Xếp hạng toàn trường'" [nzPrefix]="prefixTplOne"
+          [nzValueStyle]="{ color: '#3F8600' }"></nz-statistic>
+        <ng-template #prefixTplOne><span nz-icon nzType="arrow-up"></span></ng-template>
+      </nz-card>
+    </div>
+  </div>
+
+  <div class="table container">
+    <nz-table [nzShowPagination]="false" nzBordered #Table [nzData]="detailResult">
+      <thead>
+        <tr>
+          <th nzWidth="5%">STT</th>
+          <th nzWidth="15%">Học kỳ</th>
+          <th nzWidth="15%">Điểm rèn luyện</th>
+          <th nzWidth="15%">Xếp loại</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Table.data">
+          <td>{{ Table.data.indexOf(data) + 1 }}</td>
+          <td>{{ data.period }}</td>
+          <td>{{ data.result_point }}</td>
+          <td>{{ getResultText(data.result_point) }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<app-result-page [link]="'/home'" [title]="'Chưa có thông tin kết quả rèn luyện'" [buttonTitle]="'Quay lại trang chủ'"
+  [status]="'info'" *ngIf="(!selectedStudent.student_id)&&!(loadingService.isLoading$ | async)">
+</app-result-page>

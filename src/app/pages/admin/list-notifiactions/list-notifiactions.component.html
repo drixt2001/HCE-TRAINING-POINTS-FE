@@ -1,0 +1,97 @@
+<div class="container">
+  <h2 nz-typography>Quản lý thông báo</h2>
+  <div class="create-bar">
+    <button (click)="showModal(null)" nz-button nzType="primary">
+      <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
+      Tạo thông báo
+    </button>
+  </div>
+  <div class="table container">
+    <nz-table #Table [nzData]="listOfData">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tiêu đề</th>
+          <th>Học kỳ</th>
+          <th>Nội dung</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Table.data">
+          <td>{{ Table.data.indexOf(data) + 1 }}</td>
+          <td>{{ data.title }}</td>
+          <td>{{ data.period }}</td>
+          <td>{{ data.content }}</td>
+          <td>
+            <nz-tag *ngIf="data.status == 'draft'" [nzColor]="'orange'">Lưu nháp</nz-tag>
+            <nz-tag *ngIf="data.status == 'public'" [nzColor]="'green'">Đã thông báo</nz-tag>
+          </td>
+          <td>
+            <div style="display: flex" class="flex">
+              <button (click)="showModal(data)" nz-button nzType="default">
+                Sửa
+              </button>
+              <nz-divider nzType="vertical"></nz-divider>
+              <button nzType="default" nzDanger nz-popconfirm
+                nzPopconfirmTitle="Xác nhận xóa thông báo này? Không thể phục hồi dữ liệu!"
+                nzPopconfirmPlacement="topRight" nz-button (nzOnConfirm)="deleteNoti(data.id)">
+                Xóa
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<nz-modal [nzFooter]="modalFooter" [(nzVisible)]="isVisible" nzTitle="Tạo thông báo" (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()" nzWidth="60%">
+  <ng-container *nzModalContent>
+    <form [formGroup]="createForm" nz-form>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="title">Tiêu đề</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input formControlName="title" nz-input name="title" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email">Học kỳ</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-select formControlName="period_id" nzShowSearch nzAllowClear nzPlaceHolder="Chọn học kỳ thông báo">
+            <nz-option *ngFor="let period of listPeriods" nzLabel="{{ period.title }}" nzValue="{{ period.id }}">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email">Nội dung</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <textarea formControlName="content" nz-input placeholder="Điền nội dung thông báo chi tiết"
+            [nzAutosize]="{ minRows: 3, maxRows: 5 }"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email">Trạng thái</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-select formControlName="status" nzShowSearch nzAllowClear nzPlaceHolder="Chọn trạng thái xuất bản">
+            <nz-option nzLabel="Lưu nháp" nzValue="draft"></nz-option>
+            <nz-option nzLabel="Thông báo" nzValue="public"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+
+  <ng-template #modalFooter>
+    <button nz-button nzType="default" (click)="handleCancel()">Hủy</button>
+    <button nz-button nzType="primary" (click)="handleOk()">
+      {{ buttonTitle }}
+    </button>
+  </ng-template>
+</nz-modal>

@@ -1,0 +1,28 @@
+<nz-tabset (nzSelectChange)="log($event)" style="height: 100%;" [nzTabPosition]="nzTabPosition"
+  [(nzSelectedIndex)]="selectedIndex">
+  <nz-tab [nzTitle]="titleTemplate">
+    <ng-template #titleTemplate>
+      <span nz-icon nzType="pie-chart"></span>
+      Báo cáo tỷ lệ
+    </ng-template>
+    <div class="chart-container">
+      <h2 nz-typography>Tỷ lệ kết quả rèn luyện toàn trường</h2>
+      <div class="chart">
+        <canvas id="KQRL">{{ chart }}</canvas>
+      </div>
+    </div>
+  </nz-tab>
+
+  <nz-tab [nzTitle]="titleTemplate2">
+    <ng-template #titleTemplate2>
+      <span nz-icon nzType="pie-chart"></span>
+      Báo cáo học kỳ
+    </ng-template>
+    <div class="chart-container">
+      <h2 nz-typography>Số lượng kết quả rèn luyện toàn trường</h2>
+      <div class="chart">
+        <canvas id="HocKy">{{ barChart }}</canvas>
+      </div>
+    </div>
+  </nz-tab>
+</nz-tabset>

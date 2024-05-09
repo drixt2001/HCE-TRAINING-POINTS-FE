@@ -1,0 +1,134 @@
+<div class="container">
+  <h2 nz-typography>
+    <span>Quản lý kết quả điểm rèn luyện lớp</span>
+    <span *ngIf="viewAsLeader"> {{classname}}</span>
+  </h2>
+  <div class="fillter">
+    <div class="left">
+      <button (click)="export()" nz-button nzType="primary">
+        <span nz-icon nzType="file-excel" nzTheme="outline"></span>
+        Xuất Excel
+      </button>
+
+    </div>
+    <div class="right">
+      <nz-select *ngIf="!viewAsLeader" [(ngModel)]="selectedClass" nzPlaceHolder="Tìm sinh viên lớp">
+        <nz-option #classOption *ngFor="let option of listClass" [nzLabel]="option.short_name" [nzValue]="option.id">
+        </nz-option>
+      </nz-select>
+
+      <input nz-input placeholder="Tên sinh viên" [(ngModel)]="searchStudent" />
+      <button (click)="search()" nzSize="large" nz-button nzType="primary" nzShape="circle"><span nz-icon
+          nzType="search"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="table container">
+    <nz-table id="tablersclass" nzBordered #Table [nzData]="listResult">
+      <thead>
+        <tr>
+          <th nzWidth="5%">STT</th>
+          <th nzWidth="15%">Mã SV</th>
+          <th nzWidth="15%">Tên SV</th>
+          <th nzWidth="15%">Ngày sinh</th>
+          <th nzWidth="15%">Lớp</th>
+          <th nzWidth="15%">Điểm chính thức</th>
+          <th nzWidth="10%">Xếp hạng</th>
+          <th nzWidth="15%">Chi tiết</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Table.data">
+          <td>{{ Table.data.indexOf(data)+1}}</td>
+          <td>{{ data.student_id }}</td>
+          <td>{{ data.student_name }}</td>
+
+          <td>{{ data.birthday | date:"dd/MM/YYYY" }}</td>
+          <td>{{ data.class }}</td>
+
+
+          <td>{{ data.result_point | number }}</td>
+          <td>
+            <nz-tag [nzColor]="'green'"> {{data.rank}}</nz-tag>
+          </td>
+          <td>
+            <div style=" display: flex" class="flex">
+              <button (click)="modal(data)" nz-button nzType="default">Xem</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<nz-modal nzWidth="80%" [nzFooter]="modalFooter" [nzVisible]="isVisible && !(loadingService.isLoading$ | async)"
+  nzTitle="Chi tiết kết quả điểm rèn luyện" (nzOnCancel)="handleCancel()" nzWidth="60%">
+  <ng-container *nzModalContent>
+    <div class="info">
+      <form class="child left" nz-form>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="12">Mã sinh viên</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <nz-tag nzMode="checkable" [nzChecked]="true">{{selectedStudent.student_id}}</nz-tag>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="12">Họ và Tên</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <nz-tag nzMode="checkable" [nzChecked]="true">{{selectedStudent.student_name}}</nz-tag>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="12">Lớp</nz-form-label>
+          <nz-form-control [nzSpan]="12">
+            <nz-tag nzMode="checkable" [nzChecked]="true">{{selectedStudent.class}}</nz-tag>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+
+      <div class="child right">
+        <nz-card>
+          <nz-statistic [nzValue]="(selectedStudent.result_point | number)!" [nzTitle]="'Điểm rèn luyện toàn khóa'"
+            [nzValueStyle]="{ color: '#3F8600' }"></nz-statistic>
+        </nz-card>
+
+        <nz-card>
+          <nz-statistic [nzValue]="selectedStudent.rank" [nzTitle]="'Xếp hạng toàn trường'" [nzPrefix]="prefixTplOne"
+            [nzValueStyle]="{ color: '#3F8600' }"></nz-statistic>
+          <ng-template #prefixTplOne><span nz-icon nzType="arrow-up"></span></ng-template>
+        </nz-card>
+      </div>
+    </div>
+
+    <div class="table container">
+      <nz-table [nzShowPagination]="false" nzBordered #Table [nzData]="detailResult">
+        <thead>
+          <tr>
+            <th nzWidth="5%">STT</th>
+            <th nzWidth="15%">Học kỳ</th>
+            <th nzWidth="15%">Điểm rèn luyện</th>
+            <th nzWidth="15%">Xếp loại</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of Table.data">
+            <td>{{ Table.data.indexOf(data)+1}}</td>
+            <td>{{ data.period }}</td>
+            <td>{{ data.result_point }}</td>
+            <td>{{ getResultText(data.result_point) }}</td>
+          </tr>
+        </tbody>
+
+      </nz-table>
+    </div>
+  </ng-container>
+
+  <ng-template #modalFooter>
+    <button nz-button nzType="default" (click)="handleCancel()">Đóng</button>
+  </ng-template>
+</nz-modal>

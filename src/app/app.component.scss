@@ -1,0 +1,69 @@
+.logo {
+  height: 32px;
+  margin: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  img {
+    height: 30px;
+    object-fit: contain;
+  }
+
+  h2 {
+    color: cornflowerblue;
+    margin: 0;
+    white-space: nowrap !important;
+  }
+}
+
+nz-layout {
+  background-color: white;
+}
+nz-sider {
+  height: 100vh;
+}
+nz-header {
+  background: #fff;
+  padding: 0;
+}
+
+nz-content {
+  margin: 0 16px;
+}
+
+nz-breadcrumb {
+  margin: 16px 0;
+}
+
+.inner-content {
+  padding: 24px;
+  background: #fff;
+  min-height: 360px;
+  height: 100%;
+}
+
+nz-footer {
+  text-align: center;
+}
+
+:host ::ng-deep {
+  .ant-layout-sider-children {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .ant-card-meta-title {
+    color: cornflowerblue;
+  }
+  .ant-card-meta-description {
+    font-weight: 400;
+    font-family: revert;
+    color: #2e2e2e;
+  }
+
+  .ant-card-bordered {
+    border: none;
+  }
+}

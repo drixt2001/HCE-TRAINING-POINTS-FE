@@ -1,0 +1,241 @@
+<!-- *ngIf="isCreateNow" -->
+<div *ngIf="(!Error)&&!(loadingService.isLoading$ | async)" class="container">
+    <h2 nz-typography>Phiếu điểm đánh giá kết quả rèn luyện</h2>
+    <h3 class="period-title" nz-typography> {{formInfo?.period_title}}</h3>
+    <div class="topbar tinfo">
+        <div class="stepbar">
+            <nz-steps *ngIf="checkView('ctsv')" (nzIndexChange)="onStatusChange($event)" nzDirection="vertical"
+                nzSize="small" [nzCurrent]="formInfo?.step!-1">
+                <nz-step *ngFor="let status of listStatus" [nzTitle]="status.title"></nz-step>
+            </nz-steps>
+            <nz-steps *ngIf="!checkView('ctsv')" nzDirection="vertical" nzSize="small" [nzCurrent]="formInfo?.step!-1">
+                <nz-step *ngFor="let status of listStatus" [nzTitle]="status.title"></nz-step>
+            </nz-steps>
+        </div>
+        <div class="infobar">
+            <form nz-form>
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Họ và Tên</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.name" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Ngày sinh</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.birthday" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Giới tính</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.gender" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Lớp</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.classname" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Ngành</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.major" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="8">Chức vụ</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="student!.role" [readOnly]="true"
+                            nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </div>
+    </div>
+    <div class="midbar">
+        <div class="total">
+            <form nzLayout="vertical" nz-form>
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="6">Điểm tự đánh giá</nz-form-label>
+                    <nz-form-control [nzSpan]="14">
+                        <input [readOnly]="true" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="formInfo!.total_self" nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="6">Điểm lớp xét duyệt</nz-form-label>
+                    <nz-form-control [nzSpan]="14">
+                        <input [readOnly]="true" [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="formInfo!.total_approval" nz-input />
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="6">Điểm CVHT xác nhận</nz-form-label>
+                    <nz-form-control [nzSpan]="14">
+                        <nz-input-number [nzReadOnly]="!checkView('cvht') || formInfo!.step >= 4" [nzStep]="1"
+                            [nzMax]="100" [ngModelOptions]="{standalone: true}" [(ngModel)]="formInfo!.confirm_point"
+                            nz-input>
+                        </nz-input-number>
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                    <nz-form-label [nzSpan]="6">Điểm công bố chính thức</nz-form-label>
+                    <nz-form-control [nzSpan]="14">
+                        <nz-input-number [nzReadOnly]="!checkView('ctsv')" [nzStep]="1" [nzMin]="0" [nzMax]="100"
+                            [ngModelOptions]="{standalone: true}"
+                            [(ngModel)]="formInfo!.result_point"></nz-input-number>
+                    </nz-form-control>
+                </nz-form-item>
+            </form>
+        </div>
+        <div class="points">
+            <h4 nz-typography>Cá nhân tự xếp loại:
+                <span>
+                    <nz-tag [nzColor]="'green'">
+                        {{ getResult(formInfo!.total_self) }}
+                    </nz-tag>
+                </span>
+            </h4>
+            <h4 class="totalpoint" nz-typography> Xếp loại của lớp:
+                <span>
+                    <nz-tag [nzColor]="'green'">
+                        {{ getResult(formInfo!.total_approval) }}
+                    </nz-tag>
+                </span>
+            </h4>
+            <h4 class="totalpoint" nz-typography> Xếp loại của CVHT:
+                <span>
+                    <nz-tag [nzColor]="'green'">
+                        {{ getResult(formInfo!.confirm_point) }}
+                    </nz-tag>
+                </span>
+            </h4>
+            <h4 class="totalpoint" class="totalpoint" nz-typography> Xếp loại chính thức:
+                <span>
+                    <nz-tag [nzColor]="'green'">
+                        {{ getResult(formInfo!.result_point) }}
+                    </nz-tag>
+                </span>
+            </h4>
+            <button *ngIf="checkView('ctsv')" (click)="updateForm()" nz-button nzType="primary">
+                <span nz-icon nzType="send"></span>
+                Cập nhật
+            </button>
+            <button *ngIf="checkView('cvht') && formInfo!.step <= 3" [disabled]="!formInfo!.confirm_point"
+                (click)="updateForm(3)" nz-button nzType="primary">
+                <span nz-icon nzType="send"></span>
+                Xác nhận
+            </button>
+        </div>
+    </div>
+    <nz-table nzBordered [nzShowPagination]="false" nzSize="small">
+        <thead>
+            <tr>
+                <th>Tiêu chí đánh giá</th>
+                <th nzWidth="10%">
+                    <span>Thang điểm chuẩn</span>
+                </th>
+                <th nzWidth="10%">
+                    <span>Điểm tự đánh giá</span>
+                </th>
+                <th *ngIf="formInfo!.step >= 2 && !viewAsLeader" nzWidth="10%">
+                    Điểm do lớp đánh giá
+                </th>
+                <th *ngIf="formInfo!.step >= 3 && viewAsLeader" nzWidth="10%">
+                    Điểm do lớp đánh giá
+                </th>
+                <th *ngIf="formInfo!.step <= 2 && viewAsLeader" nzWidth="10%">
+                    Cập nhật
+                </th>
+            </tr>
+        </thead>
+    </nz-table>
+    <div class="group_point" *ngFor="let point of dataTable; let i = index">
+        <nz-table nzBordered [nzShowPagination]="false" #basicTable [nzData]="point.criteria" nzSize="small">
+            <thead>
+                <tr>
+                    <th>{{ point.title }}</th>
+                    <th nzWidth="10%"></th>
+                    <th nzWidth="10%"></th>
+                    <th *ngIf="formInfo!.step >= 2 && !viewAsLeader" nzWidth="10%"></th>
+                    <th *ngIf="formInfo!.step >= 3 && viewAsLeader" nzWidth="10%">
+                    </th>
+                    <th *ngIf="formInfo!.step <= 2 && viewAsLeader" nzWidth="10%">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of basicTable.data">
+                    <td>{{ data.title }}</td>
+                    <td>
+                        <nz-tag [nzColor]="'green'">{{ data.maxPoint }}</nz-tag>
+                    </td>
+                    <td>
+                        <nz-tag [nzColor]="'green'">{{
+                            data.points?.self_point }}
+                        </nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step >= 2  && formInfo!.total_approval && !viewAsLeader">
+                        <nz-tag [nzColor]="'red'">{{
+                            data.points?.approval_point }}
+                        </nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step >= 3  && formInfo!.total_approval && viewAsLeader">
+                        <nz-tag [nzColor]="'red'">{{
+                            data.points?.approval_point }}
+                        </nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step <= 2 && viewAsLeader">
+                        <nz-input-number [(ngModel)]="data.points.approval_point" [nzMin]="0" [nzMax]="data.maxPoint"
+                            [nzStep]="1" [nzSize]="'small'"></nz-input-number>
+                    </td>
+                </tr>
+                <tr class="total-row" *ngIf="i === dataTable.length - 1">
+                    <td>
+                        <h3 class="totalpoint" nz-typography>Tổng cộng</h3>
+                    </td>
+                    <td>
+                        <nz-tag [nzColor]="'green'">100</nz-tag>
+                    </td>
+                    <td>
+                        <nz-tag *ngIf="formInfo?.total_self" [nzColor]="'blue'">{{formInfo?.total_self}}</nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step >= 2 && formInfo!.total_approval && !viewAsLeader">
+                        <nz-tag *ngIf=" formInfo?.total_approval" [nzColor]="'red'">{{formInfo?.total_approval}}
+                        </nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step >= 3 && formInfo!.total_approval && viewAsLeader">
+                        <nz-tag *ngIf=" formInfo?.total_approval" [nzColor]="'red'">{{formInfo?.total_approval}}
+                        </nz-tag>
+                    </td>
+                    <td *ngIf="formInfo!.step <= 2 && viewAsLeader">
+                        <nz-tag [nzColor]="'blue'">{{ getTotalPoint()[1] }}</nz-tag>
+                    </td>
+                </tr>
+            </tbody>
+        </nz-table>
+    </div>
+    <button *ngIf="checkView('classleader') && formInfo!.step <= 2 && !viewAsStudent" (click)="send()" class="submit"
+        nz-button nzSize="large" nzType="primary" nzShape="round">
+        <span nz-icon nzType="send" nzTheme="outline"></span>
+        Xét Duyệt
+    </button>
+</div>
+
+<app-page404 *ngIf="(Error)">
+</app-page404>

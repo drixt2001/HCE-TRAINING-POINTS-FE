@@ -1,0 +1,75 @@
+<div class="login-container">
+  <div class="layout">
+    <div class="image-container">
+      <img src="../../../../assets/image/auth/login.png" alt="" />
+    </div>
+    <div class="form-container">
+      <div class="form">
+        <form class="login-form" (ngSubmit)="Login()">
+          <h3 style="color: cadetBlue">Thông Tin Đăng Nhập</h3>
+          <mat-form-field class="input email" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input
+              type="email"
+              matInput
+              [formControl]="emailFormControl"
+              [errorStateMatcher]="matcher"
+              placeholder="VD. 19K4081028@hce.edu.vn"
+            />
+            <mat-hint></mat-hint>
+            <mat-error
+              *ngIf="
+                emailFormControl.hasError('email') &&
+                !emailFormControl.hasError('required')
+              "
+            >
+              Địa chỉ Email không hợp lệ!
+            </mat-error>
+            <mat-error *ngIf="emailFormControl.hasError('required')">
+              Email <strong>không được để trống!</strong>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="input password" appearance="outline">
+            <mat-label>Mật Khẩu</mat-label>
+            <input
+              [type]="hide ? 'password' : 'text'"
+              matInput
+              [formControl]="passwordFormControl"
+              [errorStateMatcher]="matcher"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hide = !hide"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide"
+            >
+              <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
+            <mat-hint></mat-hint>
+            <mat-error
+              *ngIf="
+                passwordFormControl.hasError('minlength') &&
+                !passwordFormControl.hasError('required')
+              "
+            >
+              Mật khẩu cần tối thiểu có 6 ký tự!
+            </mat-error>
+            <mat-error *ngIf="passwordFormControl.hasError('required')">
+              Mật khẩu <strong>không được để trống!</strong>
+            </mat-error>
+          </mat-form-field>
+          <button
+            type="submit"
+            id="login-btn"
+            mat-stroked-button
+            color="primary"
+          >
+            Đăng Nhập
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

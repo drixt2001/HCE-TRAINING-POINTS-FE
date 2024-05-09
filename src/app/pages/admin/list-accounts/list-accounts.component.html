@@ -1,0 +1,257 @@
+<div class="container">
+  <h2 nz-typography>Quản lý tài khoản</h2>
+
+  <div class="create-bar">
+    <button (click)="showModal()" nz-button nzType="primary">
+      <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
+      Tạo tài khoản
+    </button>
+    <div class="fillter">
+      <nz-select [formControl]="searchRole" nzAllowClear nzPlaceHolder="Chọn chức vụ">
+        <nz-option *ngFor="let role of listRoles" nzLabel="{{ role.name }}" [nzValue]="role.id">
+        </nz-option>
+      </nz-select>
+      <input [(ngModel)]="searchEmail" nz-input placeholder="Tìm theo Email" />
+
+      <button (click)="search()" nzSize="large" nz-button nzType="primary" nzShape="circle">
+        <span nz-icon nzType="search"></span>
+      </button>
+    </div>
+  </div>
+  <div class="table container">
+    <nz-table nzShowSizeChanger #Table [nzData]="listAccounts">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th nzSortOrder="descend" [nzSortFn]="column.email.sortFn">Email</th>
+          <th>Ngày Tạo</th>
+          <th>Truy cập gần nhất</th>
+          <th [nzSortOrder]="null" [nzSortFn]="column.role_name.sortFn">Chức vụ</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of Table.data">
+          <td>{{ Table.data.indexOf(data) + 1 }}</td>
+          <td>{{ data.email }}</td>
+          <td>{{ data.register_date | date : "dd/MM/yyyy HH:mm" }}</td>
+          <td>{{ data.last_login | date : "dd/MM/yyyy HH:mm" }}</td>
+          <td>
+            <nz-tag *ngIf="data.role_name" [nzColor]="data.color">{{
+              data.role_name
+              }}</nz-tag>
+          </td>
+          <td>
+            <div style="display: flex" class="flex">
+              <button (click)="viewModal(data.email, data.role_code)" nz-button nzType="default">
+                Xem
+              </button>
+              <nz-divider nzType="vertical"></nz-divider>
+              <button nzType="default" nzDanger nz-popconfirm
+                nzPopconfirmTitle="Xác nhận xóa tài khoản này? Những dữ liệu như thông tin, phiếu điểm sẽ không thể phục hồi!"
+                nzPopconfirmPlacement="topRight" nz-button (nzOnConfirm)="deleteAccount(data.id)">
+                Xóa
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<nz-space> </nz-space>
+<nz-drawer nzSize="large" [nzVisible]="modalVisible && !(loadingService.isLoading$ | async)" nzPlacement="right"
+  [nzTitle]="modalTitle" [nzExtra]="modalFooter" (nzOnClose)="clickCancel()">
+  <ng-container *nzDrawerContent>
+    <form [formGroup]="createForm" nz-form>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email">Email</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <input formControlName="email" nz-input name="email" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="password">Mật khẩu</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-input-group [nzSuffix]="suffixTemplate">
+            <input [type]="passwordVisible ? 'text' : 'password'" nz-input formControlName="password" />
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #suffixTemplate>
+          <span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+            (click)="passwordVisible = !passwordVisible"></span>
+        </ng-template>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6">Chức vụ</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-select [nzDisabled]="createForm.value.role_id ? true : false" (ngModelChange)="checkViewRole($event)"
+            formControlName="role_id" nzShowSearch nzAllowClear nzPlaceHolder="Chọn chức vụ">
+            <nz-option *ngFor="let role of listRoles" nzLabel="{{ role.name }}" [nzValue]="role.id">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+    <span>
+      <form [formGroup]="managerForm" *ngIf="currentRoleCreate == 'Phòng CTSV'" nz-form>
+        <h3 style="display: flex; justify-content: center" nz-typography>
+          Thông tin cán bộ phòng CTSV
+        </h3>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Mã cán bộ</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="manager_id" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Họ và Tên</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="name" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Số điện thoại</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="phone" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Địa chỉ</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="address" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+      <form [formGroup]="teacherForm" *ngIf="currentRoleCreate == 'CVHT'" nz-form>
+        <h3 style="display: flex; justify-content: center" nz-typography>
+          Thông tin giảng viên - cố vấn học tập
+        </h3>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Mã GV</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="teacher_id" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Họ và Tên</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="name" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Khoa</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="unit" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Lớp quản lý</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select formControlName="class_id" [nzMaxTagCount]="4" nzMode="multiple" nzShowSearch nzAllowClear
+              nzPlaceHolder="Chọn các lớp quản lý">
+              <nz-option *ngFor="let class of listClass" nzLabel="{{ class.shortname }}" [nzValue]="class.id">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Số điện thoại</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="phone" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Địa chỉ</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="address" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+
+      <form [formGroup]="studentForm" *ngIf="
+          currentRoleCreate == 'Ban cán sự' || currentRoleCreate == 'Sinh viên'
+        " nz-form>
+        <h3 *ngIf="currentRoleCreate == 'Ban cán sự'" style="display: flex; justify-content: center" nz-typography>
+          Thông tin sinh viên ban cán sự
+        </h3>
+        <h3 *ngIf="currentRoleCreate == 'Sinh viên'" style="display: flex; justify-content: center" nz-typography>
+          Thông tin sinh viên
+        </h3>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Mã SV</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="student_id" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Họ và Tên</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="name" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Giới tính</nz-form-label>
+          <nz-radio-group formControlName="gender">
+            <label nz-radio-button nzValue="Nam">Nam</label>
+            <label nz-radio-button nzValue="Nữ">Nữ</label>
+          </nz-radio-group>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Ngày Sinh</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-date-picker formControlName="birthday" style="width: 100%" nzPlaceHolder="Chọn ngày sinh"
+              nzFormat="dd/MM/yyyy">
+            </nz-date-picker>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Lớp</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <nz-select formControlName="class_id" nzShowSearch nzAllowClear nzPlaceHolder="Chọn lớp trực thuộc">
+              <nz-option *ngFor="let class of listClass" nzLabel="{{ class.shortname }}" [nzValue]="class.id">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Số điện thoại</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="phone" type="number" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="6">Địa chỉ</nz-form-label>
+          <nz-form-control [nzSpan]="14">
+            <input formControlName="address" nz-input />
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </span>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #modalFooter>
+  <button nz-button nzType="default" (click)="clickCancel()">Hủy</button>
+  <button nz-button nzType="primary" (click)="clickOk()">
+    {{ buttonTitle }}
+  </button>
+</ng-template>

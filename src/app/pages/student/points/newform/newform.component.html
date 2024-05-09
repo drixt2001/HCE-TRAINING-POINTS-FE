@@ -1,0 +1,84 @@
+<div *ngIf="isCreateNow" class="container">
+  <h2 nz-typography>Phiếu điểm đánh giá kết quả rèn luyện</h2>
+  <h3 class="period-title" nz-typography> {{ period.title}}</h3>
+  <div class="infobar">
+    <nz-collapse [nzExpandIconPosition]="'left'">
+      <nz-collapse-panel [nzHeader]="'Thông tin sinh viên'" [nzExtra]="extraTpl">
+        <div class="info top">
+          <h3 class="period-title" nz-typography>Họ và Tên: {{student?.name}}</h3>
+          <h3 class="period-title" nz-typography>Ngày sinh: {{student?.birthday | date:"dd/MM/yyyy"}}</h3>
+          <h3 class="period-title" nz-typography>Giới tính: {{student?.gender}}</h3>
+        </div>
+        <div class="info bottom">
+          <h3 class="period-title" nz-typography>Lớp: {{student?.classname}}</h3>
+          <h3 class="period-title" nz-typography>
+            Ngành: {{student?.major}}
+          </h3>
+          <h3 class="period-title" nz-typography>
+            Chức vụ: {{student?.role}}
+          </h3>
+        </div>
+      </nz-collapse-panel>
+    </nz-collapse>
+    <ng-template #extraTpl>
+      <span nz-icon nzType="user" nzTheme="outline"></span>
+    </ng-template>
+  </div>
+  <nz-table nzBordered [nzShowPagination]="false" nzSize="small">
+    <thead>
+      <tr>
+        <th nzWidth="60%">Tiêu chí đánh giá</th>
+        <th nzWidth="15%">
+          <span>Thang điểm chuẩn</span>
+        </th>
+        <th nzWidth="15%">
+          <span>Điểm tự đánh giá</span>
+        </th>
+
+      </tr>
+    </thead>
+  </nz-table>
+  <div class="group_point" *ngFor="let group of groupData; let i = index">
+    <nz-table nzBordered [nzShowPagination]="false" #basicTable [nzData]="group.criteria" nzSize="small">
+      <thead>
+        <tr>
+          <th nzWidth="60%">{{ group.title }}</th>
+          <th nzWidth="15%"></th>
+          <th nzWidth="15%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of basicTable.data">
+          <td>{{ data.title }}</td>
+          <td>
+            <nz-tag [nzColor]="'green'">{{ data.maxPoint }}</nz-tag>
+          </td>
+          <td>
+            <nz-input-number [(ngModel)]="data.selfPoint" [nzMin]="0" [nzMax]="data.maxPoint" [nzStep]="1"
+              [nzSize]="'small'"></nz-input-number>
+          </td>
+        </tr>
+        <tr class="total-row" *ngIf="i == groupData.length - 1">
+          <td>
+            <h3 class="totalpoint" nz-typography>Tổng cộng</h3>
+          </td>
+          <td>
+            <nz-tag [nzColor]="'green'">100</nz-tag>
+          </td>
+          <td>
+            <nz-tag [nzColor]="'red'">{{ getTotalPoint()[0] }}</nz-tag>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+  <h3 class="totalpoint" nz-typography>Cá nhân tự xếp loại: {{ getResult() }}</h3>
+  <button (click)="send()" class="submit" nz-button nzSize="large" nzType="primary" nzShape="round">
+    <span nz-icon nzType="send" nzTheme="outline"></span>
+    {{ buttonTitle }}
+  </button>
+</div>
+
+<app-result-page [link]="'/home'" [title]="titleResult" [buttonTitle]="'Quay lại trang chủ'" [status]="'info'"
+  *ngIf="(!isCreateNow)&&!(loadingService.isLoading$ | async)">
+</app-result-page>
